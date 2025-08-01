@@ -23,12 +23,10 @@ jobs:
     - name: Build React app
       run: npm run build
 
-    - name: unit-test-cases
-      run: npm test -- --watchAll=false
-
   security-check:
     runs-on: self-hosted
     needs: compile
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -45,9 +43,29 @@ jobs:
       run: npm audit --audit-level=high
       continue-on-error: true
 
+  unit-test-cases:
+    runs-on: self-hosted
+    needs: security-check
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Unit Tests
+      run: npm test -- --watchAll=false
+
   sonarqube-analysis:
     runs-on: self-hosted
-    needs: compile
+    needs: unit-test-cases
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
