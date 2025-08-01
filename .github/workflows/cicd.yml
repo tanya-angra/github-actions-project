@@ -5,10 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  compile:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -16,7 +14,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'  # or whatever version you use
+        node-version: '18'
 
     - name: Install dependencies
       run: npm install
@@ -24,3 +22,21 @@ jobs:
     - name: Build React app
       run: npm run build
 
+  security-check:
+    runs-on: ubuntu-latest
+    needs: compile  # Ensures this runs after 'compile' job
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: security-check
+      run: npm audit --audit-level=high
+      continue-on-error: true
